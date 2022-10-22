@@ -51,9 +51,15 @@ describe('UsersService', () => {
     expect(result).rejects.toThrow();
   })
 
-  it('should return user token', async () => {
-    const result = await service.login(userMock.email, userMock.password);
+  it('should return an user', async () => {
+    const result = await service.findByEmail("john");
 
-    expect(result).toBe("token-usuário");
+    expect(result).toHaveProperty("id");
+  })
+
+  it('should throw if email not user found', async () => {
+    const result = service.findByEmail("invalid_email");
+
+    expect(result).rejects.toThrow();
   })
 });
