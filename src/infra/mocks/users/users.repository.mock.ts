@@ -19,7 +19,7 @@ export class UsersRepositoryMock implements IUsersRepository {
     },
   ];
 
-  async create(user: User): Promise<boolean> {
+  async create(user: User): Promise<User> {
     const userExists = await this.getByEmail(user.email);
 
     if(userExists) {
@@ -28,7 +28,7 @@ export class UsersRepositoryMock implements IUsersRepository {
 
     this.users.push(user);
 
-    return true;
+    return user;
   };
 
   async getByEmail(email: string): Promise<User> {

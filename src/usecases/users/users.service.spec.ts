@@ -42,7 +42,7 @@ describe('UsersService', () => {
   it('should create an user', async () => {
     const resultado = await service.create(userMock);
 
-    expect(resultado).toBe(true);
+    expect(resultado).toHaveProperty("email");
   })
 
   it('should throw if user email already exists', async () => {

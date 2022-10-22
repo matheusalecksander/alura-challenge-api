@@ -31,7 +31,8 @@ describe('authController', () => {
         password: "changeme",
       })
 
-      expect(result).toBe("token-usuário");
+      expect(result.token).toBe("token-usuário");
+      expect(result).toBeTruthy();
     });
   });
 });

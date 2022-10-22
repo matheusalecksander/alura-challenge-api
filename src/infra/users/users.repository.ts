@@ -4,8 +4,8 @@ import { IUsersRepository } from "src/domain/users/interfaces/users.repository.i
 
 @Injectable()
 export class UsersRepository implements IUsersRepository {
-  async create(user: User): Promise<boolean> {
-    return true;
+  async create(user: User): Promise<User> {
+    return user;
   };
 
   async getByEmail(email: string): Promise<User> {
