@@ -1,5 +1,7 @@
 services:
   api:
+    depends_on:
+      - postgres
     build:
       dockerfile: Dockerfile
       context: .
@@ -13,3 +15,17 @@ services:
     command: npm run start:dev
     ports:
       - 4500:4500
+  postgres:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=public
+    ports:
+      - '5432:5432'
+    volumes:
+      - docker-nest-postgres:/var/lib/postgresql/data
+volumes:
+  docker-nest-postgres:

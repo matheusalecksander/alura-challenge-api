@@ -1,0 +1,51 @@
+
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id String @id @default(uuid())
+  name String
+  password String
+  email String
+  incomes Income[]
+  outcomes Outcome[]
+}
+
+model Income {
+  id String @id @default(uuid())
+  description String
+  value BigInt
+  createdAt DateTime @default(now())
+  category Category @relation(fields: [categoryId], references: [id])
+  categoryId String
+  userId String
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Outcome {
+  id String @id @default(uuid())
+  description String
+  value BigInt
+  installments Int @default(1)
+  installmentsPaid Int
+  fixed Boolean @default(false)
+  createdAt DateTime @default(now())
+  category Category @relation(fields: [categoryId], references: [id])
+  categoryId String
+  userId String
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Category {
+  id String @id @default(uuid())
+  name String
+  incomes Income[]
+  outcomes Outcome[]
+}
