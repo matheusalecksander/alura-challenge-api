@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { User } from '@prisma/client';
-import { UsersRepository } from './infra/users.repository';
-import { UsersRepositoryMock } from './mocks/users.repository.mock';
+import { UsersRepositoryMock } from '../../infra/mocks/users/users.repository.mock';
+import { UsersRepository } from '../../infra/users/users.repository';
 import { UsersService } from './users.service';
 
 const userMock: User = {
@@ -28,8 +28,8 @@ describe('UsersService', () => {
         { 
           provide: UsersRepository,
           useClass: UsersRepositoryMock
-        }
-      ],
+        },
+      ]
     }).compile();
 
     service = module.get<UsersService>(UsersService);
