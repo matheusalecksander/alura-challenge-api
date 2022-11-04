@@ -4,10 +4,15 @@ import { IAuth } from 'src/domain/auth/interfaces/auth.interface';
 import { ILoginQuery } from 'src/domain/auth/interfaces/login.query';
 import { UsersQuery } from '../../domain/users/query/users.query';
 import { UsersService } from '../users/users.service';
+import { JwtService } from '@nestjs/jwt';
+import "dotenv/config";
 
 @Injectable()
 export class AuthService implements IAuth {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly jwtService: JwtService,
+  ) {}
   
   async login(email: string, password: string): Promise<ILoginQuery> {
     const usuario = await this.usersService.findByEmail(email);
@@ -16,15 +21,16 @@ export class AuthService implements IAuth {
       throw new BadRequestException("Senha inválida");
     }
 
-    const userQuery = UsersQuery.make({
-      email: usuario.email,
-      id: usuario.id,
+    const payload = {
       name: usuario.name,
-    })
+      id: usuario.id,
+    }
+
+    const token = this.jwtService.sign(payload);
 
     const result: ILoginQuery = {
-      user: userQuery,
-      token: "token-usuário"
+      user: payload,
+      token,
     }
 
     return result;

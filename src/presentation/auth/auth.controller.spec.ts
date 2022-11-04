@@ -4,35 +4,57 @@ import { UsersRepository } from '../../infra/users/users.repository';
 import { UsersService } from '../../usecases/users/users.service';
 import { AuthController } from './auth.controller';
 import { AuthService } from '../../usecases/auth/auth.service'
+import { JwtService, JwtModule } from '@nestjs/jwt';
+import { PassportModule } from '@nestjs/passport';
+import { agent } from 'supertest';
+import { INestApplication } from '@nestjs/common';
 
 describe('authController', () => {
   let authController: AuthController;
+  let app: INestApplication;
 
   beforeEach(async () => {
-    const app: TestingModule = await Test.createTestingModule({
+    const mock: TestingModule = await Test.createTestingModule({
+      imports: [
+        PassportModule.register({ defaultStrategy: 'jwt'}),
+        JwtModule.register({
+          secretOrPrivateKey: "jwt-teste",
+        }),
+      ],
       controllers: [AuthController],
       providers: [
         AuthService,
         UsersService,
+        JwtService,
         {
           provide: UsersRepository,
           useClass: UsersRepositoryMock,
         }
       ]
     }).compile();
-
-    authController = app.get<AuthController>(AuthController);
+    authController = mock.get<AuthController>(AuthController);
+    
+    app = mock.createNestApplication();
+    await app.init();
   });
 
   describe('root', () => {
-    it("should return -> token-usuario", async () => {
-      const result = await authController.login({
+    it("should return -> token", async () => {
+      const user = {
         email: "john",
         password: "changeme",
-      })
-
-      expect(result.token).toBe("token-usuário");
-      expect(result).toBeTruthy();
+      }
+      
+      agent(app.getHttpServer()).post('/auth/login').send(user).expect(200);
     });
+
+    it("should throw if user password not match", async () => {
+      const mock = {
+        email: "john",
+        password: "wrong pass",
+      }
+
+      agent(app.getHttpServer()).post('/auth/login').send(mock).expect(400);
+    })
   });
 });
