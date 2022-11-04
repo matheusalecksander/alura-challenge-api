@@ -26,7 +26,7 @@ export class AuthService implements IAuth {
       id: usuario.id,
     }
 
-    const token = this.jwtService.sign(payload);
+    const token = this.jwtService.sign(payload, { secret: process.env.JWT_KEY});
 
     const result: ILoginQuery = {
       user: payload,

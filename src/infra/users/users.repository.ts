@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { User } from "@prisma/client";
 import { IUsersRepository } from "src/domain/users/interfaces/users.repository.interface";
+import { prismaClient } from "../../utils/database/prisma";
 
 @Injectable()
 export class UsersRepository implements IUsersRepository {
@@ -9,6 +10,12 @@ export class UsersRepository implements IUsersRepository {
   };
 
   async getByEmail(email: string): Promise<User> {
-    return null;
+    const user = await prismaClient.user.findUnique({
+      where: {
+        email
+      }
+    });
+
+    return user;
   };
 }

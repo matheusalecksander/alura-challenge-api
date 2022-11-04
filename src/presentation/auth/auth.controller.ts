@@ -2,12 +2,14 @@ import { Body, Controller, Injectable, Post } from "@nestjs/common";
 import { AuthService } from "../../usecases/auth/auth.service";
 
 @Injectable()
-@Controller()
+@Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post('/auth/login')
+  @Post('/signin')
   async login(@Body() { email, password }) {
-    return this.authService.login(email, password)
+    const result = this.authService.login(email, password);
+
+    return result;
   }
 }

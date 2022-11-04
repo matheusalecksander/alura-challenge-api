@@ -3,10 +3,10 @@ import { UsersRepositoryMock } from '../../infra/mocks/users/users.repository.mo
 import { UsersRepository } from '../../infra/users/users.repository';
 import { UsersService } from '../../usecases/users/users.service';
 import { AuthController } from './auth.controller';
-import { AuthService } from '../../usecases/auth/auth.service'
+import { AuthService } from '../../usecases/auth/auth.service';
 import { JwtService, JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
-import { agent } from 'supertest';
+import * as request from 'supertest';
 import { INestApplication } from '@nestjs/common';
 
 describe('authController', () => {
@@ -16,9 +16,9 @@ describe('authController', () => {
   beforeEach(async () => {
     const mock: TestingModule = await Test.createTestingModule({
       imports: [
-        PassportModule.register({ defaultStrategy: 'jwt'}),
+        PassportModule.register({ defaultStrategy: 'jwt' }),
         JwtModule.register({
-          secretOrPrivateKey: "jwt-teste",
+          secretOrPrivateKey: 'jwt-teste',
         }),
       ],
       controllers: [AuthController],
@@ -29,32 +29,38 @@ describe('authController', () => {
         {
           provide: UsersRepository,
           useClass: UsersRepositoryMock,
-        }
-      ]
+        },
+      ],
     }).compile();
     authController = mock.get<AuthController>(AuthController);
-    
+
     app = mock.createNestApplication();
     await app.init();
   });
 
   describe('root', () => {
-    it("should return -> token", async () => {
+    it('should return -> token', async () => {
       const user = {
-        email: "john",
-        password: "changeme",
-      }
-      
-      agent(app.getHttpServer()).post('/auth/login').send(user).expect(200);
+        email: 'john',
+        password: 'changeme',
+      };
+
+      const response = await request(app.getHttpServer())
+      .post('/auth/signin')
+      .send(user)
+      .expect(201)
     });
 
-    it("should throw if user password not match", async () => {
+    it('should throw if user password not match', async () => {
       const mock = {
-        email: "john",
-        password: "wrong pass",
-      }
+        email: 'john',
+        password: 'wrong pass',
+      };
 
-      agent(app.getHttpServer()).post('/auth/login').send(mock).expect(400);
-    })
+      const response = await request(app.getHttpServer())
+        .post('/auth/signin')
+        .send(mock)
+        .expect(400);
+    });
   });
 });
